@@ -29,12 +29,17 @@ moviec=[[ gen[int(i)] for i in re.findall(r'\d{1}',_)] for _ in set1]
 
 print(*moviec)
 
+final=[]
 for s,k in zip(moviec,range(256)):
     
     r=requests.get(f"https://www.imdb.com/search/title?genres={','.join(s)}&groups=top_250&sort=user_rating,desc")
     soup=BeautifulSoup(r.text)
-    final=[(_find('a')['href'].split('/')[2], _.find('a').text) for _ in soup.find('div',{'id':"main"}).findAll('h3', {'class': "lister-item-header"},vectors[k])]
+    line=[(_.find('a')['href'].split('/')[2], _.find('a').text) for _ in soup.find('div',{'id':"main"}).findAll('h3', {'class': "lister-item-header"})]
+    line.append(vectors[k])
+    print(*line)
+    final.append(line)
 
+    
 print(*final)
 
 
