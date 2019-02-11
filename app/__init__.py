@@ -10,7 +10,8 @@ from config import MONGO_URI
 # Define the WSGI application object
 app = Flask(__name__, static_url_path = '/static')
 client = pymongo.MongoClient(MONGO_URI)
-db = client.test
+DATABASE = MONGO_URI.split('/')[-1]
+db = client[DATABASE]
 
 # Configurations
 app.config.from_object('config')
