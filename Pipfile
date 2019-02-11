@@ -5,12 +5,10 @@ name = "pypi"
 
 [packages]
 "bs4" = "*"
-flask-pymongo = "*"
 requests = "*"
 numpy = "*"
 flask-wtf = "*"
-
-[dev-packages]
+pymongo = "*"
 
 [requires]
 python_version = "3.6"

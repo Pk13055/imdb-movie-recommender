@@ -3,18 +3,20 @@ from functools import wraps
 # Import flask and template operators
 from flask import Flask, render_template,session, blueprints,jsonify
 from flask_wtf.csrf import CSRFProtect,CSRFError
-from flask_pymongo import PyMongo
+import pymongo
 
+from config import MONGO_URI
 
 # Define the WSGI application object
 app = Flask(__name__, static_url_path = '/static')
+client = pymongo.MongoClient(MONGO_URI)
+db = client.test
 
 # Configurations
 app.config.from_object('config')
 
 # Define the database object which is imported
 # by modules and controllers
-mongo = PyMongo(app)
 
 # csrf protection
 csrf=CSRFProtect(app)
