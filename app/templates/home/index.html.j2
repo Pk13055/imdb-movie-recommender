@@ -1,0 +1,13 @@
+{% extends 'home/base.html.j2' %}
+{% block content %}
+<div class="row">
+	<div class="col-xs-12">
+		<div class="well">Hello, World!</div>
+	</div>
+	<div class="col-xs-12">
+		{% for record in data %}
+		<div class="well">{{ record }}</div>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
