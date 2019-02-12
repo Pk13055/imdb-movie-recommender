@@ -1,7 +1,7 @@
 from functools import wraps
 
 # Import flask and template operators
-from flask import Flask, render_template,session, blueprints,jsonify
+from flask import Flask, render_template,session, blueprints,jsonify, redirect
 from flask_wtf.csrf import CSRFProtect,CSRFError
 import pymongo
 
@@ -41,6 +41,10 @@ def requires_auth(f):
 			return jsonify(success=False, message="Unauthorized entry. Login First"), 400
 		return f(*args, **kwargs)
 	return decorated
+
+@app.route('/', methods=['GET'])
+def main_route():
+	return redirect('/home')
 
 # Import a module / component using its blueprint handler variable (mod_auth)
 from app.home.controller import home
