@@ -1,0 +1,39 @@
+{% extends 'home/base.html.j2' %}
+{% block content %}
+<div class="row">
+    <h1>{{ movie['Title'] }}</h1>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <img src={{ movie['Poster'] }} alt="Movie Poster">
+    </div>
+    <div class="col-sm-8">
+    <ul class="list-group">
+        <li class="list-group-item">Year: {{ movie['Year'] }}</li>
+        <li class="list-group-item">Runtime: {{ movie['Runtime'] }}</li>
+        <li class="list-group-item">Genre: {{ movie['Genre'] }}</li>
+        <li class="list-group-item">Director: {{ movie['Director'] }}</li>
+        <li class="list-group-item">Writer: {{ movie['Writer'] }}</li>
+        <li class="list-group-item">Production: {{ movie['Production'] }}</li>
+        <li class="list-group-item">Cast: {{ movie['Actors'] }}</li>
+        <li class="list-group-item">Language: {{ movie['Language'] }}</li>
+        <li class="list-group-item">Country: {{ movie['Country'] }}</li>
+    </ul>
+    </div>
+</div>
+<div class="row">
+<ul class="list-group">
+    <li class="list-group-item">Plot: {{ movie['Plot'] }}</li>
+    <li class="list-group-item">Awards: {{ movie['Awards'] }}</li>
+    <li class="list-group-item">Ratings: 
+    {% for rating in movie['Ratings'] %}
+        <p>{{ rating['Source'] }}: {{ rating['Value'] }}</p>
+    {% endfor %}
+    </li>
+    <li class="list-group-item">IMDB Votes: {{ movie['imdbVotes'] }}</p>
+    <li class="list-group-item">IMDB ID: {{ movie['imdbID'] }}</li>
+    <li class="list-group-item">Website: {{ movie['Website'] }}</li>
+    <li class="list-group-item">Encoding: {{ movie['onehot'] }}</li>
+</ul>
+</div>
+{% endblock %}

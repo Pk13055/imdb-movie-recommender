@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<style>
+		.container-fluid {
+			padding-top: 70px;
+			padding-bottom: 70px;
+		}
+	</style>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>App</title>
@@ -11,7 +17,9 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="container-fluid">
 	{% block content %}
 	{% endblock %}
+</div>
 </body>
 </html>
