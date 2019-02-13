@@ -1,0 +1,50 @@
+{% extends "user/base.html.j2" %}
+{% block head %}
+<script>
+    $(document).ready(function() {
+        $("div.error-message").fadeOut(3000);
+    });
+</script>
+{% endblock head %}
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Signin <small>Login to see recommendations</small></h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">Signin</div>
+            <form action="/user/signin/" method="POST">
+                <div class="panel-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-addon">Email</span>
+                                <input type="email" class="form-control" name="email" placeholder="john@example.com" aria-describedby="sizing-addon1" required autofocus>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-addon">Password</span>
+                                <input type="password" class="form-control" name="password" aria-describedby="sizing-addon1" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button class="btn-success btn-block" type="submit"><h4>Login!</h4></button>
+                    <p class="text-muted">Don't have an account? <a href="/user/signup/">Sign up</a> now.</p>
+                    <p>
+                        {% for message in get_flashed_messages() %}
+                        <div class="label label-danger error-message">{{ message }}</div>
+                        {% endfor %}
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -35,10 +35,9 @@ def not_found(error):
 # modify this according to your needs
 def requires_auth(f):
 	@wraps(f)
-	@login_required
 	def decorated(*args, **kwargs):
 		if 'user_uid' not in session:
-			return jsonify(success=False, message="Unauthorized entry. Login First"), 400
+			return redirect('/user/signin/')
 		return f(*args, **kwargs)
 	return decorated
 
@@ -48,7 +47,9 @@ def main_route():
 
 # Import a module / component using its blueprint handler variable (mod_auth)
 from app.home.controller import home
+from app.user.controller import user
 
 # Register blueprint(s)
 app.register_blueprint(home)
+app.register_blueprint(user)
 

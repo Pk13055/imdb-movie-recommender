@@ -1,0 +1,25 @@
+{% extends "user/base.html.j2" %}
+{% block content %}
+<div class="row">
+    <div class="jumbotron">
+        <h2>{{ user.name }}</h2>
+    </div>
+</div>
+<div class="row">
+        <div class="col-xs-12 col-sm-4">
+                <a href="#!" class="thumbnail poster">
+                    <img src="{{ user.picture }}" alt="Movie Poster" class="media-object">
+                </a>
+            </div>
+            <div class="col-xs-12 col-sm-8">
+                <ul class="list-group">
+                    {% for key in categories %}
+                    <a href="#!" class="list-group-item">
+                        <h4 class="list-group-item-heading">{{ key | title }}</h4>
+                        <p class="list-group-item-text">{{ user[key] }}</p>
+                    </a>
+                    {% endfor %}
+                </ul>
+            </div>
+</div>
+{% endblock content %}

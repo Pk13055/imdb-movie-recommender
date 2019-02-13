@@ -4,7 +4,7 @@ from flask import (Blueprint, abort, flash, g, jsonify, redirect,
                    render_template, request, session, url_for)
 
 import app.home.helper as helper
-from app import db, models
+from app import db, models, requires_auth
 
 home = Blueprint('home', __name__, url_prefix='/home')
 
@@ -18,7 +18,8 @@ def home_route():
 	return render_template('home/index.html.j2', **context_kwargs)
 
 
-@home.route('/movies/<imdbid>', methods = ['GET'])
+@home.route('/movies/<imdbid>/', methods = ['GET'])
+@requires_auth
 def mov_info(imdbid):
 	movie = db.movies.find_one( {"imdbID" : imdbid})
 	if movie is None:

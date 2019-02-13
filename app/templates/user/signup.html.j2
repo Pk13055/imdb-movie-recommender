@@ -1,0 +1,99 @@
+{% extends "user/base.html.j2" %}
+{% block head %}
+<script>
+    $(document).ready(function() {
+        $("div.error-message").fadeOut(3000);
+    });
+</script>
+{% endblock head %}
+{% block content %}
+<div class="row">
+    <h1>Signup <small>Get personalized recommendations</small></h1>
+</div>
+<div class="row">
+    <div class="panel panel-primary">
+        <div class="panel-heading">Signup</div>
+        <form method="POST" action="/user/signup/">
+            <div class="panel-body">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon" id="sizing-addon1">Name</span>
+                            <input type="text" class="form-control" name="name" placeholder="John Appleseed" aria-describedby="sizing-addon1" required autofocus>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon" id="sizing-addon1">@</span>
+                            <input type="email" class="form-control" name="email" placeholder="john@example.com" aria-describedby="sizing-addon1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"><hr></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon" id="sizing-addon1">Password</span>
+                            <input type="password" class="form-control" name="password" aria-describedby="sizing-addon1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"><hr></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p class="lead text-muted">Gender</p>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="radio" name="gender" id="male" value="male" aria-label="..." required>
+                            </span>
+                            <label for="male" class="form-control lead">Male</label>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="radio" name="gender" id="female" value="female" aria-label="...">
+                            </span>
+                            <label for="female" class="form-control lead">Female</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"><hr></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p class="lead text-muted">Age</p>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="radio" name="age" id="12-26" value="0" aria-label="..." required>
+                            </span>
+                            <label for="12-26" class="form-control lead">12-26</label>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <input type="radio" name="age" id="26-34" value="1" aria-label="...">
+                            </span>
+                            <label for="26-34" class="form-control lead">26-34</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button class="btn-primary btn-block" type="submit"><h4>Create Account!</h4></button>
+                <p class="text-muted">Already have an account? <a href="/user/signin/">Sign in</a> now.</p>
+                <p id="error-messages">
+                    {% for message in get_flashed_messages() %}
+                    <div class="label label-danger error-message">{{ message }}</div>
+                    {% endfor %}
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
