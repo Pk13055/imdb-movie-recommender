@@ -61,7 +61,6 @@ def userpage_route():
 			}
 		}, upsert=True)
 		user = db.users.find_one({'email': session['user_uid']})
-		flash("Preferences updated!")
 
 	context_kwargs = {
 		'title': f"User - {user['name']}",
