@@ -11,12 +11,44 @@ from app import db, models, requires_auth, csrf
 user = Blueprint('user', __name__, url_prefix='/user')
 
 
+@user.route('/signup/', methods=['GET', 'POST'])
+def signup_route():
+	if request.method == "POST":
+		email = request.form['email']
+		picture = f"https://www.gravatar.com/avatar/{hashlib.md5(email.encode()).hexdigest()}?s=200&d=identicon&r=PG"
+		data = {
+			'name': request.form['name'],
+			'email': email,
+			'age': request.form['age'],
+			'gender': request.form['gender'],
+			'password': generate_password_hash(request.form['password']),
+			'picture': picture,
+			'Genre': {
+				'liked': [],
+				'disliked': [],
+			},
+		}
+		existing = db.users.find_one({'email' : email })
+		if existing:
+			flash('User already exists!')
+		else:
+			db.users.insert_one(data)
+			session['user_uid'] = email
+			return redirect('/user/recommend/')
+	context_kwargs = {
+		'title': "Signup",
+		'include_nav': False,
+	}
+	return render_template('user/signup.html.j2', **context_kwargs)
+
 @user.route('/', methods=['GET','POST'])
 @requires_auth
 def userpage_route():
 	user = db.users.find_one({'email': session['user_uid']})
 	categories = ['name', 'email', 'age', 'gender']
-	genres = ['Action','Animation','Comedy','Crime','Documentary','Drama','Horror','Romance','Sci-Fi']
+	genres = ["Animation", "Family", "Drama", "Sport", "Comedy", "Romance","Crime",
+			"Mystery", "Film-Noir", "Biography", "Western", "Horror" "Musical","Action",
+			"Adventure", "Music", "War", "Fantasy", "History", "Thriller", "Sci-Fi"]
 
 	if request.method == "POST":
 		new_list = request.form.getlist('updatedList[]')
@@ -42,31 +74,7 @@ def userpage_route():
 	}
 	return render_template('user/profile.html.j2', **context_kwargs)
 
-@user.route('/signup/', methods=['GET', 'POST'])
-def signup_route():
-	if request.method == "POST":
-		email = request.form['email']
-		picture = f"https://www.gravatar.com/avatar/{hashlib.md5(email.encode()).hexdigest()}?s=200&d=identicon&r=PG"
-		data = {
-			'name': request.form['name'],
-			'email': email,
-			'age': request.form['age'],
-			'gender': request.form['gender'],
-			'password': generate_password_hash(request.form['password']),
-			'picture': picture
-		}
-		existing = db.users.find_one({'email' : email })
-		if existing:
-			flash('User already exists!')
-		else:
-			db.users.insert_one(data)
-			session['user_uid'] = email
-			return redirect('/user/recommend/')
-	context_kwargs = {
-		'title': "Signup",
-		'include_nav': False,
-	}
-	return render_template('user/signup.html.j2', **context_kwargs)
+
 
 
 @user.route('/signin/', methods=['GET', 'POST'])
