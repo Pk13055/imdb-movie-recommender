@@ -6,21 +6,39 @@ from flask import (Blueprint, abort, flash, g, jsonify, redirect,
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import app.user.helper as helper
-from app import db, models, requires_auth
+from app import db, models, requires_auth, csrf
 
 user = Blueprint('user', __name__, url_prefix='/user')
 
 
-@user.route('/', methods=['GET'])
+@user.route('/', methods=['GET','POST'])
 @requires_auth
 def userpage_route():
 	user = db.users.find_one({'email': session['user_uid']})
 	categories = ['name', 'email', 'age', 'gender']
+	genres = ['Action','Animation','Comedy','Crime','Documentary','Drama','Horror','Romance','Sci-Fi']
+
+	if request.method == "POST":
+		new_list = request.form.getlist('updatedList[]')
+		liked = 'liked' if request.form['likedOrNot'] == 'true' else 'disliked'
+		db.users.update_one({
+			'_id': user['_id']
+		},{
+			'$set': {
+				f'Genre.{liked}': new_list
+			}
+		}, upsert=True)
+		user = db.users.find_one({'email': session['user_uid']})
+		flash("Preferences updated!")
+
 	context_kwargs = {
 		'title': f"User - {user['name']}",
 		'include_nav': True,
 		'user' : user,
 		'categories': categories,
+		'genres': genres,
+		'user_liked': user['Genre']['liked'],
+		'user_disliked': user['Genre']['disliked'],
 	}
 	return render_template('user/profile.html.j2', **context_kwargs)
 

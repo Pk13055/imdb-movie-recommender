@@ -1,25 +1,82 @@
 {% extends "user/base.html.j2" %}
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script>
+$(document).ready(function() {
+    let updateList = (likedOrNot) => {
+        let name_type = (likedOrNot)? "liked" : "disliked";
+        let selected = $(`input[name='${name_type}']:checked`).map((_, el) => $(el).val()).get();
+
+        $.ajax({
+            url: '/user/',
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': $('meta[name=csrf-token]').attr('content')
+            },
+            data: {
+                'updatedList': selected,
+                'likedOrNot': likedOrNot
+            }
+        });
+    };
+    $("input[name='liked']").change(function(e) {
+        updateList(true);
+    });
+    $("input[name='disliked']").change(function(e) {
+        updateList(false);
+    });
+});
+</script>
+{% endblock head %}
 {% block content %}
 <div class="row">
     <div class="jumbotron">
-        <h2>{{ user.name }}</h2>
+        <h1>{{ user.name }}</h1>
     </div>
 </div>
 <div class="row">
-        <div class="col-xs-12 col-sm-4">
-                <a href="#!" class="thumbnail poster">
-                    <img src="{{ user.picture }}" alt="Movie Poster" class="media-object">
+    <div class="col-xs-12 col-sm-3">
+        <a href="#!" class="thumbnail poster">
+            <img src="{{ user.picture }}" alt="Profile Picture" class="media-object">
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+            <ul class="list-group">
+                {% for key in categories %}
+                <a href="#!" class="list-group-item">
+                    <h4 class="list-group-item-heading">{{ key | title }}</h4>
+                    <p class="list-group-item-text">{{ user[key] }}</p>
                 </a>
-            </div>
-            <div class="col-xs-12 col-sm-8">
-                <ul class="list-group">
-                    {% for key in categories %}
-                    <a href="#!" class="list-group-item">
-                        <h4 class="list-group-item-heading">{{ key | title }}</h4>
-                        <p class="list-group-item-text">{{ user[key] }}</p>
-                    </a>
+                {% endfor %}
+            </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-warning">
+            <div class="panel-heading"><h4>Genre Preferences</h4></div>
+
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">Liked</h4>
+                    {% for genre in genres %}
+                    <label class="checkbox-inline">
+                    <input type="checkbox" name="liked" value="{{ genre }}" {% if genre in user_liked %} checked {% endif %}>
+                    {{ genre }}
+                    </label>
                     {% endfor %}
-                </ul>
-            </div>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">Disliked</h4>
+                    {% for genre in genres %}
+                    <label class="checkbox-inline">
+                    <input type="checkbox" name="disliked" value="{{ genre }}" {% if genre in user_disliked %} checked {% endif %}>
+                    {{ genre }}
+                    </label>
+                    {% endfor %}
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 {% endblock content %}

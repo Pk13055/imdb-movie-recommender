@@ -43,7 +43,7 @@ def requires_auth(f):
 
 @app.route('/', methods=['GET'])
 def main_route():
-	return redirect('/home')
+	return redirect('/movies/')
 
 # Import a module / component using its blueprint handler variable (mod_auth)
 from app.home.controller import home

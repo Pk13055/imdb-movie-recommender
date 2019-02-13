@@ -4,9 +4,9 @@ from flask import (Blueprint, abort, flash, g, jsonify, redirect,
                    render_template, request, session, url_for)
 
 import app.home.helper as helper
-from app import db, models, requires_auth
+from app import db, models
 
-home = Blueprint('home', __name__, url_prefix='/home')
+home = Blueprint('home', __name__, url_prefix='/movies')
 
 
 @home.route('/', methods = ['GET'])
@@ -18,8 +18,7 @@ def home_route():
 	return render_template('home/index.html.j2', **context_kwargs)
 
 
-@home.route('/movies/<imdbid>/', methods = ['GET'])
-@requires_auth
+@home.route('/<imdbid>/', methods = ['GET'])
 def mov_info(imdbid):
 	movie = db.movies.find_one( {"imdbID" : imdbid})
 	if movie is None:
@@ -30,7 +29,7 @@ def mov_info(imdbid):
 	genres = [(cat, val) for cat, val in zip(genres, movie['onehot'])]
 	ratings = movie['Ratings']
 	context_kwargs = {
-		'title': "MovieInfo",
+		'title': movie['Title'],
 		'movie' : movie,
 		'top_info': top_info,
 		'more_info': more_info,
