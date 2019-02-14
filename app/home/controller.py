@@ -26,7 +26,7 @@ def mov_info(imdbid):
 		abort(404)
 	top_info = ['Year', 'Runtime', 'Genre', 'Director', 'Actors', 'Language']
 	more_info = ['Awards', 'imdbVotes', 'imdbID', 'Website', 'Production', 'Country']
-	genres = [ 'action', 'animation', 'comedy', 'documentary', 'drama', 'horror', 'crime', 'romance', 'sci-fi']
+	genres = ['Action', 'Animation', 'Comedy', 'Documentary', 'Drama', 'Horror', 'Crime', 'Romance', 'Sci-Fi']
 	genres = [(cat, val) for cat, val in zip(genres, movie['onehot'])]
 	ratings = movie['Ratings']
 	context_kwargs = {

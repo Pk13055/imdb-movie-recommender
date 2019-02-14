@@ -47,7 +47,7 @@ def userpage_route():
 	user = db.users.find_one({'email': session['user_uid']})
 	categories = ['name', 'email', 'age', 'gender']
 	genres = ["Animation", "Family", "Drama", "Sport", "Comedy", "Romance","Crime",
-			"Mystery", "Film-Noir", "Biography", "Western", "Horror" "Musical","Action",
+			"Mystery", "Film-Noir", "Biography", "Western", "Horror", "Musical","Action",
 			"Adventure", "Music", "War", "Fantasy", "History", "Thriller", "Sci-Fi"]
 
 	if request.method == "POST":
