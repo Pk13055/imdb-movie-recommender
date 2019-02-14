@@ -19,12 +19,20 @@ the recommender system.
 
 ### Loading the database
 
+There is a data dump in the `data/` folder that can be used to directly populate
+your database with the required collections.
+```bash
+mongorestore --db <db_name> db_dump/test
+```
+
+#### Loading movies
+
 To load the database, just run the `mongoimport` command to read form the JSON.
 ```bash
 mongoimport --db <db_name> --collection movies --file data_final.json --jsonArray --drop
 ```
 
-### Loading the users
+#### Loading the users
 
 - The users have been precreated and stored in the `users.json` file.
 - Additionally, you can use the `gen_users.py` to generate new users as well

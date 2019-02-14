@@ -15,23 +15,24 @@ user = Blueprint('user', __name__, url_prefix='/user')
 def signup_route():
 	if request.method == "POST":
 		email = request.form['email']
-		picture = f"https://www.gravatar.com/avatar/{hashlib.md5(email.encode()).hexdigest()}?s=200&d=identicon&r=PG"
-		data = {
-			'name': request.form['name'],
-			'email': email,
-			'age': request.form['age'],
-			'gender': request.form['gender'],
-			'password': generate_password_hash(request.form['password']),
-			'picture': picture,
-			'Genre': {
-				'liked': [],
-				'disliked': [],
-			},
-		}
 		existing = db.users.find_one({'email' : email })
 		if existing:
 			flash('User already exists!')
 		else:
+			picture = f"https://www.gravatar.com/avatar/{hashlib.md5(email.encode()).hexdigest()}?s=200&d=identicon&r=PG"
+			data = {
+				'name': request.form['name'],
+				'email': email,
+				'age': request.form['age'],
+				'gender': request.form['gender'],
+				'password': generate_password_hash(request.form['password']),
+				'picture': picture,
+				'Genre': {
+					'liked': [],
+					'disliked': [],
+				},
+				'ratings': {}
+			}
 			db.users.insert_one(data)
 			session['user_uid'] = email
 			return redirect('/user/recommend/')

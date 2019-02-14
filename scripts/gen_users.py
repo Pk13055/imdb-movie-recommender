@@ -14,7 +14,7 @@ import json
 import random
 import string
 from sys import argv as rd
-from math import ceil, floor
+from math import ceil, floor, log10
 
 from werkzeug.security import generate_password_hash
 import pandas as pd
@@ -23,6 +23,7 @@ ran_n = lambda n: ''.join(random.choice(string.ascii_uppercase + string.ascii_lo
 printj = lambda js: print(json.dumps(js, indent=4))
 age_h = lambda ratio: ratio if ratio < 1 else 1 / ratio
 
+data = json.load(open('data_final.json'))
 cross_mapping = pd.read_csv('genre_counts.csv')
 age_mapping = {
     "Animation": 1,
@@ -150,6 +151,47 @@ def gen_genres(n: int, rand: bool=False) -> list:
     return genres, ages
 
 
+def gen_rating(genres: list) -> dict:
+    """Generate movie ratings on the basis of genres liked
+
+    :param genres: list -> list of genres
+    :return ratings: dict -> dict of movie ratings
+        {
+            'imdbID' : val,
+            ...
+        }
+    """
+    liked, disliked = genres.values()
+    final = {}
+    movie_set_like = set([_['imdbID'] for _ in data for genre in liked if genre in _['Genre']])
+    movie_set_dislike = [_['imdbID'] for _ in data for genre in disliked if genre in _['Genre']]
+    movie_set_like = list(movie_set_like - set(movie_set_dislike))
+    like_n = 7 + random.randint(-1, 2)
+    like_n = like_n if like_n <= len(movie_set_like) else len(movie_set_like)
+    like_ids = random.sample(movie_set_like, like_n)
+
+    dis_n = ceil(0.33 * like_n)
+    dis_n = dis_n if dis_n <= len(movie_set_dislike) else len(movie_set_dislike)
+    dis_n = random.randint(0,  dis_n)
+    dislike_ids = random.sample(movie_set_dislike, dis_n)
+
+    liked_movies = [(_['imdbID'], _['imdbRating'], _['Ratings']) for _ in data if _['imdbID'] in like_ids]
+    disliked_movies = [(_['imdbID'], _['imdbRating'], _['Ratings']) for _ in data if _['imdbID'] in dislike_ids]
+
+    liked_movies = [(imdbID, [imdbRating] + [_['Value'] for _ in ratings]) for imdbID, imdbRating, ratings in liked_movies]
+    disliked_movies = [(imdbID, [imdbRating] + [_['Value'] for _ in ratings]) for imdbID, imdbRating, ratings in disliked_movies]
+    for i, movie_t in enumerate([liked_movies, disliked_movies]):
+        dev = lambda: -1 * i * random.random() * 3e-2
+        for movieID, ratings in movie_t:
+            rating = [float(_.split('/')[0]) if '/' in _ else float(_.split('%')[0]) if '%' in _ else float(_) for _ in ratings]
+            rating = [_ / (10 ** ceil(log10(_))) for _ in rating]
+            rating = (sum(rating) / len(rating) + dev())
+            rating += -1 * i * random.random() * 0.5
+            rating = 0 if rating < 0 else 1 if rating > 1 else rating
+            final.update({movieID: round(10 * rating, 1)})
+    return final
+
+
 def gen_users(n: int) -> dict:
     """Generate random users
     :param n: int -> number of users to generate
@@ -174,7 +216,7 @@ def gen_users(n: int) -> dict:
         password = generate_password_hash(name_)
         email = f"{name_}@{random.choice(emails)}.com"
         gender = genders[_ % 2]
-        users.append({
+        cur_user = {
             'email': email,
             'name': name,
             'age': ages[_],
@@ -182,7 +224,9 @@ def gen_users(n: int) -> dict:
             'password': password,
             'Genre': genres[_],
             'picture': f"https://www.gravatar.com/avatar/{ran_n(32)}?s=200&d=identicon&r=PG%22"
-        })
+        }
+        cur_user['ratings'] = gen_rating(genres[_])
+        users.append(cur_user)
     return users
 
 def main():

@@ -1,4 +1,25 @@
 {% extends 'home/base.html.j2' %}
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock head %}
+{% block scripts %}
+<script>
+    $("input.slider").on('input', function() {
+        let val = $(this).val();
+        $(this).closest('a').find('label.rating-sliders').text(val);
+        setTimeout(() => $.ajax({
+            url: "/movies/updateRating/",
+            type: "POST",
+            headers: {
+                'X-CSRFToken': $('meta[name=csrf-token]').attr('content')
+            },
+            data: {
+                'rating': val,
+                'imdbID': $(this).attr('id')
+            }}), 1000);
+    });
+</script>
+{% endblock scripts %}
 {% block content %}
 <div class="row">
     <div class="col-xs-12">
@@ -65,6 +86,12 @@
                         <p class="list-group-item-text">{{ rating['Value'] }}</p>
                     </a>
                     {% endfor %}
+                    <a href="#!" class="list-group-item">
+                        <h4 class="list-group-item-heading">Personal Rating
+                            <small><label class="label label-primary rating-sliders">{{ user['ratings'][movie['imdbID']] }}</label></small>
+                        </h4>
+                        <input class="slider" type="range" max=10 min=0 step=0.1 value="{{ user['ratings'][movie['imdbID']] }}" id="{{ movie['imdbID'] }}">
+                    </a>
                 </div>
             </div>
         </div>
