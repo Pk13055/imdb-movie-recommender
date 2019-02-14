@@ -35,7 +35,7 @@ def signup_route():
 			}
 			db.users.insert_one(data)
 			session['user_uid'] = email
-			return redirect('/user/recommend/')
+			return redirect(url_for('user.profile_route'))
 	context_kwargs = {
 		'title': "Signup",
 		'include_nav': False,
@@ -44,7 +44,7 @@ def signup_route():
 
 @user.route('/', methods=['GET','POST'])
 @requires_auth
-def userpage_route():
+def profile_route():
 	user = db.users.find_one({'email': session['user_uid']})
 	categories = ['name', 'email', 'age', 'gender']
 	genres = ["Animation", "Family", "Drama", "Sport", "Comedy", "Romance","Crime",
@@ -84,7 +84,7 @@ def signin_route():
 		exists = db.users.find_one({ 'email' : email })
 		if exists and check_password_hash(exists['password'], request.form['password']):
 			session['user_uid'] = request.form['email']
-			return redirect('/user/recommend/')
+			return redirect(url_for('user.recommend_route'))
 		else:
 			flash("Incorrect email/password combination")
 
@@ -100,15 +100,33 @@ def signin_route():
 def signout_route():
 	if 'user_uid' in session:
 		session.pop('user_uid')
-	return redirect('/')
+	return redirect(url_for('main_route'))
 
 
 @user.route('/recommend/', methods=['GET', 'POST'])
 @requires_auth
 def recommend_route():
-	# TODO: add recommendation analysis here
+	user = db.users.find_one({'email': session['user_uid']})
+	already_rated = list(user['ratings'].keys())
+	movies = db.movies.aggregate([{ '$match': {
+		'imdbID': {
+			'$nin' : already_rated
+			}}}, {
+			'$sample': { 'size': 8 }
+		}])
+	if request.method == "POST":
+		req_type = request.form['type']
+		movie_set = helper.process_movie(user, req_type)
+		return jsonify({
+			'status': True,
+			'data': movie_set,
+			'ratings': user['ratings'],
+			'type': req_type
+		})
 	context_kwargs = {
 		'title': "Recommendations",
 		'include_nav': True,
+		'data': movies,
+		'user' : user,
 	}
 	return render_template('user/recommend.html.j2', **context_kwargs)

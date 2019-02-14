@@ -1,60 +1,13 @@
 {% extends 'home/base.html.j2' %}
+{% from "macros.html.j2" import render_tile with context %}
 {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="{{ url_for('static', filename='js/slider.js') }}"></script>
 {% endblock head %}
-{% block scripts %}
-<script>
-  $("input.slider").on('input', function() {
-    let val = $(this).val();
-    $(this).closest('p').find('label.rating-sliders').text(val);
-    setTimeout(() => $.ajax({
-      url: "/movies/updateRating/",
-      type: "POST",
-      headers: {
-        'X-CSRFToken': $('meta[name=csrf-token]').attr('content')
-      },
-      data: {
-        'rating': val,
-        'imdbID': $(this).attr('id')
-      },
-      success: function(resp) {
-        if(!resp.status) {
-          alert(resp.error + " Please login!");
-          window.location.replace('/user/signin/');
-        }
-      }}), 1000);
-  });
-</script>
-{% endblock scripts %}
 {% block content %}
-<div class="row">
-  {% for movie in data %}
-  <div class="col-sm-12 col-md-3">
-    <div class="thumbnail">
-      <img src="{{ movie['Poster'] }}" alt="Movie Poster">
-      <div class="caption">
-        <h3>"{{ movie['Title'] }}"</h3>
-        <p>{{ movie['Plot'] }}</p>
-        <p>
-          <a href="https://www.imdb.com/title/{{ movie['imdbID'] }}/" class="btn btn-primary" role="button">
-            <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
-          </a>
-          <a href="/movies/{{ movie['imdbID'] }}" class="btn btn-default" role="button">
-            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-          </a>
-        </p>
-        <p>
-          {% if 'user_uid' in session %}
-          <input type="range" class="slider" id="{{ movie['imdbID'] }}" min=0 max=10 step=0.1 value="{{ user['ratings'][movie['imdbID']] }}">
-          <label class="label label-primary rating-sliders" data-id="{{ movie['imdbID'] }}">{{ user['ratings'][movie['imdbID']] }}</label>
-          {% else %}
-          <input type="range" class="slider" id="{{ movie['imdbID'] }}" min=0 max=10 step=0.1>
-          <label class="label label-primary rating-sliders" data-id="{{ movie['imdbID'] }}"></label>
-          {% endif %}
-        </p>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
+<div class="flex-row row">
+	{% for movie in data %}
+		{{ render_tile(movie, user) }}
+	{% endfor %}
 </div>
 {% endblock %}

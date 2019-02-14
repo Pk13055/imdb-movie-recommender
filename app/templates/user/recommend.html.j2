@@ -1,39 +1,37 @@
 {% extends "user/base.html.j2" %}
+{% from "macros.html.j2" import render_tile with context %}
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link href="{{ url_for('static', filename='css/slider.css') }}" rel="stylesheet">
+{% endblock head %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/slider.js') }}"></script>
+<script src="{{ url_for('static', filename='js/trigger.js') }}"></script>
+{% endblock scripts %}
 {% block content %}
 <div class="row">
+    <div class="jumbotron">
+        <h2>Rate the following <small>Recommendations will be personalized on this basis</small></h2>
+    </div>
+    <div class="flex-row row">
+    {% for movie in data %}
+        {{ render_tile(movie, user) }}
+    {% endfor %}
+    </div>
+</div>
+{% for title, target, color in [('User - User', 'user', 'primary'),
+                                ('Item - Item', 'item', 'danger'),
+                                ('Matrix Factorization', 'matrix', 'success')] %}
+<div class="row">
     <div class="col-xs-12">
-        <div class="panel panel-default">
-            <div class="panel-heading"><h3>Rate the following</h3></div>
-            <div class="panel-body">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio quod, fugiat, explicabo modi magni corporis aliquid sunt soluta deserunt et quae! Magnam dolorum architecto obcaecati doloribus! Minus animi veritatis error.</div>
+        <div class="panel panel-{{ color }}">
+            <div class="panel-heading"><h4><strong>{{ title }}</strong> Collaborative Filtering</h4></div>
+            <div class="panel-body movie-holder" data-target="{{ target }}"></div>
             <div class="panel-footer">
-                <button class="btn btn-default btn-block">Compute!</button>
+                <button class="btn btn-{{ color }} btn-block recommend_trigger" data-trigger="{{ target }}">Compute!</button>
             </div>
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-xs-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading"><h4>User - User Collaborative Filtering</h4></div>
-            <div class="panel-body">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio quod, fugiat, explicabo modi magni corporis aliquid sunt soluta deserunt et quae! Magnam dolorum architecto obcaecati doloribus! Minus animi veritatis error.</div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-12">
-        <div class="panel panel-danger">
-            <div class="panel-heading"><h4>Item - Item Collaborative Filtering</h4></div>
-            <div class="panel-body">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio quod, fugiat, explicabo modi magni corporis aliquid sunt soluta deserunt et quae! Magnam dolorum architecto obcaecati doloribus! Minus animi veritatis error.</div>
-        </div>
-    </div>
-</div>
-<div class="row">
-        <div class="col-xs-12">
-            <div class="panel panel-success">
-                <div class="panel-heading"><h4>Matrix Factorization</h4></div>
-                <div class="panel-body">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio quod, fugiat, explicabo modi magni corporis aliquid sunt soluta deserunt et quae! Magnam dolorum architecto obcaecati doloribus! Minus animi veritatis error.</div>
-            </div>
-        </div>
-    </div>
-
+{% endfor %}
 {% endblock content %}

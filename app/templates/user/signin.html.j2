@@ -36,7 +36,10 @@
                 </div>
                 <div class="panel-footer">
                     <button class="btn-success btn-block" type="submit"><h4>Login!</h4></button>
-                    <p class="text-muted">Don't have an account? <a href="/user/signup/">Sign up</a> now.</p>
+                    <p class="text-muted">
+                        Don't have an account? <a href="/user/signup/">Sign up</a> now.
+                        Go back <a href="/">home</a>.
+                    </p>
                     <p>
                         {% for message in get_flashed_messages() %}
                         <div class="label label-danger error-message">{{ message }}</div>

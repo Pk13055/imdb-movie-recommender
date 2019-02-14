@@ -4,31 +4,71 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MRS - {{ title }}</title>
-	<!-- Fonts -->
-	<link href="https://fonts.googleapis.com/css?family=Oswald|Roboto" rel="stylesheet">
 	<!-- stylsheets -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 	<style>
- 	 	main {
-    		flex: 1 0 auto;
-  		}
-		body {
-			 display: flex;
-    		min-height: 100vh;
-    		flex-direction: column;
-			font-family: 'Roboto' sans-serif !important;
+		main {
+			flex: 1 0 auto;
 		}
-		h1, h2, h3, h4, h5, h6 {
-			font-family: 'Oswald' sans-serif !important;
+		body {
+			display: flex;
+			min-height: 100vh;
+			flex-direction: column;
+		}
+		.flex-row {
+			display: flex;
+			flex-wrap: wrap;
+			padding-left: 15px;
+			padding-right: 15px;
+		}
+		.flex-row > [class*='col-'] {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.flex-row .thumbnail,
+		.flex-row .caption {
+			flex-direction: column;
+			display: flex;
+			flex: 1 0 auto;
+			height: auto;
+			position: relative;
+		}
+		.flex-text {
+			flex-grow: 1;
+		}
+		.flex-row img {
+			min-width: 0;
+			width: 100%;
 		}
 	</style>
 	<!-- scripts -->
-	<script src=https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+	<script>
+		// Returns a function, that, as long as it continues to be invoked, will not
+		// be triggered. The function will be called after it stops being called for
+		// N milliseconds. If `immediate` is passed, trigger the function on the
+		// leading edge, instead of the trailing.
+		function debounce(func, wait, immediate) {
+			var timeout;
+			return function() {
+				var context = this, args = arguments;
+				var later = function() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
+		};
+	</script>
 	{% block mainhead %}{% endblock mainhead %}
 </head>
 
-<body style="background-color: #EEEEEE;">
+<body style="background-color: #000000;">
 	{% block maincontent %}{% endblock maincontent %}
 	{% block scripts %}{% endblock scripts %}
 </body>

@@ -1,11 +1,11 @@
-# Statement for enabling the development environment
-ENV = 'development'
-DEBUG = True
-
-# Define the application directory
 import os
 import pymongo
 
+# Statement for enabling the development environment
+ENV = os.environ.get('ENVIRONMENT', 'development')
+DEBUG = os.environ.get('DEBUG', False)
+
+# Define the application directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_BASE = os.path.abspath(os.path.join(BASE_DIR, 'uploads'))
 

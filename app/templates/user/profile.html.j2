@@ -1,32 +1,7 @@
 {% extends "user/base.html.j2" %}
 {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<script>
-$(document).ready(function() {
-    let updateList = (likedOrNot) => {
-        let name_type = (likedOrNot)? "liked" : "disliked";
-        let selected = $(`input[name='${name_type}']:checked`).map((_, el) => $(el).val()).get();
-
-        $.ajax({
-            url: '/user/',
-            type: 'POST',
-            headers: {
-                'X-CSRFToken': $('meta[name=csrf-token]').attr('content')
-            },
-            data: {
-                'updatedList': selected,
-                'likedOrNot': likedOrNot
-            }
-        });
-    };
-    $("input[name='liked']").change(function(e) {
-        updateList(true);
-    });
-    $("input[name='disliked']").change(function(e) {
-        updateList(false);
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='js/likes.js') }}"></script>
 {% endblock head %}
 {% block content %}
 <div class="row">
@@ -36,7 +11,7 @@ $(document).ready(function() {
 </div>
 <div class="row">
     <div class="col-xs-12 col-sm-3">
-        <a href="#!" class="thumbnail poster">
+        <a href="{{ user.picture }}" class="thumbnail poster" style="background-color: #000000;" target="_blank">
             <img src="{{ user.picture }}" alt="Profile Picture" class="media-object">
         </a>
     </div>

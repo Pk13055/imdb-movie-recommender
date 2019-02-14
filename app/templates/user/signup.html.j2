@@ -86,7 +86,10 @@
             </div>
             <div class="panel-footer">
                 <button class="btn-primary btn-block" type="submit"><h4>Create Account!</h4></button>
-                <p class="text-muted">Already have an account? <a href="/user/signin/">Sign in</a> now.</p>
+                <p class="text-muted">
+                    Already have an account? <a href="/user/signin/">Sign in</a> now.
+                    Go back <a href="/">home</a>.
+                </p>
                 <p id="error-messages">
                     {% for message in get_flashed_messages() %}
                     <div class="label label-danger error-message">{{ message }}</div>

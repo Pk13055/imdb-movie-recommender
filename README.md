@@ -6,6 +6,25 @@
 - The **9 base genres** spanned over the *majority* of the movies.
 - Additionally, a set of 500 organic users has also been generated. Certain statistical measures have been taken to ensure the _random_ data generated is representative of real world users.
 
+### Installation &amp; Running
+
+- Install dependencies:
+
+```bash
+pipenv install --dev
+```
+
+- Populate environment variables:
+  - `$DATABASE_URL`: The JDBC mongo URI to connect to
+  - `$ENVIRONMENT`: 'production' or 'development'
+  - `$DEBUG`: 'true' or 'false'
+
+- Run the application
+
+```bash
+./run.py [port]
+```
+
 ## Datasets
 
 The file `data_final.json` houses the 173 movie database that we'll be using for
@@ -45,6 +64,7 @@ mongoimport --db <db_name> --collection users --file users.json --jsonArray
 - Login based enforcement for movie information and user related pages.
 - Internal likes are only counted when the user creates an account, and are registered using simple, intuitive sliders for each movie.
 - Given the scarcity of the data, every user has a `ratings` key that contains a list of the all the movies he has rated with their respective ratings. This can be used (supplemented by additional ratings and movie information) to personalize recommendations.
+- The application uses CSRF protection for added security against XSS attacks and stores password in a salted hash, ensuring security and integrity of the data.
 
 ## Analysis &amp; Data selection
 
@@ -110,25 +130,36 @@ _Note: In case the user database size was substantial ($> 10^7$), even a random 
 
 ### Recommendation Methods
 
-####User-User Collaborative Filtering
+#### User-User Collaborative Filtering
 
-- It is a form of collaborative filtering for recommender systems which identifies other users with similar tastes to a target user and combines their ratings to make recommendations for that user.
-- Karl Pearson's correlation is used to see how similar two users are.
-- To make sure that similarity value does not get biased, the genres are strategically distributed among the dummy users so that number of common ratings does not get too low.
+> It is a form of collaborative filtering for recommender systems which identifies other users with similar tastes to a target user and combines their ratings to make recommendations for that user.
 
+- Karl Pearson's correlation is used to see how similar two users are; this normalizes user optimism and ensures equal-scaled similarity matching.
 
-####Item-Item Collaborative Filtering
+- Given that our user genres have been modeled off real world statistics, this correlation metric is representative of a real-world setting.
 
-- It is a form of collaborative filtering for recommender systems based on the similarity between items calculated using user's ratings of those items. 
-- Item-Item models use rating distributions per item, not per user. With more users than items, each item tends to have more ratings than each user, so an item's average rating usually doesn't change quickly. This leads to more stable rating distributions in the model, so the model doesn't have to be rebuilt as often. When users consume and then rate an item, that item's similar items are picked from the existing system model and added to the user's recommendations.
--To calculate similarity between two items, we look into the set of items the target user has rated and computes how similar they are to the target item i and then selects k most similar items. Similarity between two items is calculated by taking the ratings of the users who have rated both the items and thereafter using a similarity function.
+#### Item-Item Collaborative Filtering
 
+> It is a form of collaborative filtering for recommender systems based on the similarity between items calculated using user's ratings of those items.
 
-####Matrix Factorization 
-- Matrix factorization is a class of recommender systems algorithms which work by decomposing the user-item interaction matrix into the product of two lower dimensionality rectangular matrices. (Matrix Decomposition)
+- *Item-Item* models use rating distributions per item, not per user. With more users than items, each item tends to have more ratings than each user, so an item's average rating usually doesn't change quickly. This leads to more stable rating distributions in the model, so the model doesn't have to be rebuilt as often. When users consume and then rate an item, that item's similar items are picked from the existing system model and added to the user's recommendations.
+
+- To calculate similarity between two items, we look into the set of items the target user has rated and computes how similar they are to the target item i and then selects k most similar items. Similarity between two items is calculated by taking the ratings of the users who have rated both the items and thereafter using a similarity function.
+
+#### Matrix Factorization
+
+>Matrix factorization is a class of recommender systems algorithms which work by decomposing the user-item interaction matrix into the product of two lower dimensionality rectangular matrices. (Matrix Decomposition)
+
 - The strength of matrix factorization is the fact that it can incorporate implicit feedback, information that are not directly given but can be derived by analyzing user behavior. Using this strength we can estimate if a user is going to like a movie that (he/she) never saw. And if that estimated rating is high, we can recommend that movie to the user.
+
 - Technique used: SVD++
     - SVD++ was designed to take into account implicit interactions.
     - Compared to older SVD, it also takes in account user and item bias.
-    - Predicted Rating given by user u to item i is computed as:
-   [formula](https://wikimedia.org/api/rest_v1/media/math/render/svg/49a5bcbbe78017ed9f0c07f046514702043701cc)
+
+## Conclusion and further work
+
+Given the end to end nature of the application, I am planning to develop it as a standalone platform as well. A major limitations of the application is live recalculation of the filtering algorithms, something that needs to be either database cached or triggered to precalculate certain values prior to calling of the filtering.
+
+- Cron scripts can be run that do this for us periodically so newer better recommendations are offered.
+- Another option is to use something like majority voting across techniques to maximize relevance of the suggestions.
+- Finally, given that this is a toy example (~200 movies and 500 users), to bring it closer to real world performance, we need to up the users and movies by quite a bit.
