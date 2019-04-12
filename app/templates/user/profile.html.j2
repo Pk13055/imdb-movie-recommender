@@ -1,7 +1,12 @@
 {% extends "user/base.html.j2" %}
+{% from "macros.html.j2" import render_tile with context %}
 {% block head %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="{{ url_for('static', filename='js/likes.js') }}"></script>
+<link href="{{ url_for('static', filename='css/slider.css') }}" rel="stylesheet">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/slider.js') }}"></script>
+{% endblock scripts %}
 {% endblock head %}
 {% block content %}
 <div class="row">
@@ -52,6 +57,16 @@
                 </li>
             </ul>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="flex-row row">
+        <h3>Movies History <small>watched/liked</small></h3>
+    </div>
+    <div class="flex-row row movie-holder">
+        {% for movie in data %}
+            {{ render_tile(movie, user) }}
+        {% endfor %}
     </div>
 </div>
 {% endblock content %}

@@ -31,7 +31,7 @@ def signup_route():
 					'liked': [],
 					'disliked': [],
 				},
-				'ratings': {}
+				'ratings': []
 			}
 			db.users.insert_one(data)
 			session['user_uid'] = email
@@ -63,6 +63,15 @@ def profile_route():
 		}, upsert=True)
 		user = db.users.find_one({'email': session['user_uid']})
 
+	data = db.movies.find({
+		'raters': {
+			'$elemMatch': {
+				'name': 'id',
+				'value': session['user_uid']
+			}
+		}
+	})
+
 	context_kwargs = {
 		'title': f"User - {user['name']}",
 		'include_nav': True,
@@ -71,6 +80,7 @@ def profile_route():
 		'genres': genres,
 		'user_liked': user['Genre']['liked'],
 		'user_disliked': user['Genre']['disliked'],
+		'data': data
 	}
 	return render_template('user/profile.html.j2', **context_kwargs)
 
@@ -107,13 +117,10 @@ def signout_route():
 @requires_auth
 def recommend_route():
 	user = db.users.find_one({'email': session['user_uid']})
-	already_rated = list(user['ratings'].keys())
-	movies = db.movies.aggregate([{ '$match': {
-		'imdbID': {
-			'$nin' : already_rated
-			}}}, {
-			'$sample': { 'size': 8 }
-		}])
+	already_rated = db.users.aggregate([{ '$match': { 'email': session['user_uid'] }}, { '$project': { '_id': 0, 'ratings': { '$map': {
+                    'input': "$ratings",
+                    'as': "rating",
+                    'in': "$$rating.id" }}}}])
 	if request.method == "POST":
 		req_type = request.form['type']
 		movie_set = helper.process_movie(user, req_type)

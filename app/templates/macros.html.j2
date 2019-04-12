@@ -3,7 +3,7 @@
     <div class="thumbnail">
         <img src="{{ movie['Poster'] }}" alt="Movie Poster">
         <div class="caption">
-            <h3>"{{ movie['Title'] }}"</h3>
+            <h3>"{{ movie['Title'] }}" <small>{{ movie['Year'] }}</small></h3>
             <p>{{ movie['Plot'] }}</p>
             <p>
                 <a href="https://www.imdb.com/title/{{ movie['imdbID'] }}/" class="btn btn-primary" role="button">

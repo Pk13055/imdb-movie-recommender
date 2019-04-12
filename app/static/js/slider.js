@@ -9,7 +9,7 @@ $(document).ready(function() {
                 'X-CSRFToken': $('meta[name=csrf-token]').attr('content')
             },
             data: {
-                'rating': val,
+                'rating': parseFloat(val),
                 'imdbID': $(this).attr('id')
             },
             success: function(resp) {

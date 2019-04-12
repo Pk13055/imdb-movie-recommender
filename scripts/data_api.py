@@ -28,6 +28,7 @@ def fetch_data(id: str, onehot: list) -> dict:
     print("Processing", id, end="\r", flush=True)
     res = requests.get(BASE_URL, params=config).json()
     res['onehot'] = onehot
+    res['raters'] = []
     return res
 
 

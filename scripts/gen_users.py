@@ -10,6 +10,7 @@
 23.5	    20	        27	        27	    0.8703  	Drama	        80	        89	        0.8988764045
 10.5        8	        13	        11	    0.9545  	Romance	        55	        77	        0.7142857143
 """
+import os
 import json
 import random
 import string
@@ -18,12 +19,23 @@ from math import ceil, floor, log10
 
 from werkzeug.security import generate_password_hash
 import pandas as pd
+import pymongo
+
+try:
+    MONGO_URI = os.environ.get('DATABASE_URL', None)
+    client = pymongo.MongoClient(MONGO_URI)
+    DATABASE = MONGO_URI.split('/')[-1]
+    db = client[DATABASE]
+except Exception as e:
+    print(f"Couldn't connect to database, check your $DATABASE_URL | {e}")
+    exit(-1)
 
 ran_n = lambda n: ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(n))
 printj = lambda js: print(json.dumps(js, indent=4))
 age_h = lambda ratio: ratio if ratio < 1 else 1 / ratio
 
 data = json.load(open('data_final.json'))
+raters = {_['imdbID']: [] for _ in data}
 cross_mapping = pd.read_csv('genre_counts.csv')
 age_mapping = {
     "Animation": 1,
@@ -162,7 +174,7 @@ def gen_rating(genres: list) -> dict:
         }
     """
     liked, disliked = genres.values()
-    final = {}
+    final = []
     movie_set_like = set([_['imdbID'] for _ in data for genre in liked if genre in _['Genre']])
     movie_set_dislike = [_['imdbID'] for _ in data for genre in disliked if genre in _['Genre']]
     movie_set_like = list(movie_set_like - set(movie_set_dislike))
@@ -188,7 +200,10 @@ def gen_rating(genres: list) -> dict:
             rating = (sum(rating) / len(rating) + dev())
             rating += -1 * i * random.random() * 0.5
             rating = 0 if rating < 0 else 1 if rating > 1 else rating
-            final.update({movieID: round(10 * rating, 1)})
+            final.append({
+                'id' : movieID,
+                'rating': round(10 * rating, 1)
+            })
     return final
 
 
@@ -215,6 +230,7 @@ def gen_users(n: int) -> dict:
         name = name_ + " " + ran_n(random.randint(5, 20))
         password = generate_password_hash(name_)
         email = f"{name_}@{random.choice(emails)}.com"
+        raters.update({email: []})
         gender = genders[_ % 2]
         cur_user = {
             'email': email,
@@ -226,12 +242,27 @@ def gen_users(n: int) -> dict:
             'picture': f"https://www.gravatar.com/avatar/{ran_n(32)}?s=200&d=identicon&r=PG%22"
         }
         cur_user['ratings'] = gen_rating(genres[_])
+        [raters[_].append({
+            'id': email,
+            'rating': val
+        }) for _, val in cur_user['ratings'].items()]
         users.append(cur_user)
-    return users
+    return users, raters
+
+
+def updateMovies(raters: dict) -> None:
+    """Update the movie database with the rater references as well
+
+    :param raters: dict -> imdbID <-> list[email]
+    :return None:
+    """
+    db.movies.update_many()
+
 
 def main():
-    users = gen_users(int(rd[1]))
+    users, raters = gen_users(int(rd[1]))
     json.dump(users, open('users.json', 'w'))
+    updateMovies(raters)
 
 if __name__ == "__main__":
     main()
